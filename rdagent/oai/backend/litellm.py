@@ -84,10 +84,11 @@ class LiteLLMAPIBackend(APIBackend):
             "input": input_content_list,
             **LITELLM_SETTINGS.embedding_extra_params,
         }
-        if LITELLM_SETTINGS.embedding_openai_api_key:
-            call_kwargs["api_key"] = LITELLM_SETTINGS.embedding_openai_api_key
-        if LITELLM_SETTINGS.embedding_openai_base_url:
-            call_kwargs["api_base"] = LITELLM_SETTINGS.embedding_openai_base_url
+        # Use proxy config from LITELLM_SETTINGS (reads LITELLM_PROXY_API_KEY and LITELLM_PROXY_API_BASE)
+        if LITELLM_SETTINGS.proxy_api_key:
+            call_kwargs["api_key"] = LITELLM_SETTINGS.proxy_api_key
+        if LITELLM_SETTINGS.proxy_api_base:
+            call_kwargs["api_base"] = LITELLM_SETTINGS.proxy_api_base
         response = embedding(**call_kwargs)
         response_list = [data["embedding"] for data in response.data]
         return response_list

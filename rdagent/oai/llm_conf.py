@@ -88,6 +88,9 @@ class LLMSettings(ExtendedBaseSettings):
     embedding_max_str_num: int = 50
     embedding_max_length: int = 8192
     embedding_extra_params: dict = {}
+    # LiteLLM proxy config (for embedding)
+    proxy_api_key: str = ""
+    proxy_api_base: str = ""
 
     # offline llama2 related config
     use_llama2: bool = False
