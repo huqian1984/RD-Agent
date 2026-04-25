@@ -84,11 +84,11 @@ class LiteLLMAPIBackend(APIBackend):
             "input": input_content_list,
             **LITELLM_SETTINGS.embedding_extra_params,
         }
-        # Use proxy config from LITELLM_SETTINGS (reads LITELLM_PROXY_API_KEY and LITELLM_PROXY_API_BASE)
-        if LITELLM_SETTINGS.proxy_api_key:
-            call_kwargs["api_key"] = LITELLM_SETTINGS.proxy_api_key
-        if LITELLM_SETTINGS.proxy_api_base:
-            call_kwargs["api_base"] = LITELLM_SETTINGS.proxy_api_base
+        # Use embedding OpenAI-Compatible config
+        if LITELLM_SETTINGS.embedding_openai_compatible_api_key:
+            call_kwargs["api_key"] = LITELLM_SETTINGS.embedding_openai_compatible_api_key
+        if LITELLM_SETTINGS.embedding_openai_compatible_api_base:
+            call_kwargs["api_base"] = LITELLM_SETTINGS.embedding_openai_compatible_api_base
         response = embedding(**call_kwargs)
         response_list = [data["embedding"] for data in response.data]
         return response_list
@@ -159,11 +159,19 @@ class LiteLLMAPIBackend(APIBackend):
         complete_kwargs = self.get_complete_kwargs()
         model = complete_kwargs["model"]
 
+        # Use OpenAI-Compatible API config for chat completion
+        call_kwargs: dict[str, Any] = {}
+        if LITELLM_SETTINGS.chat_openai_compatible_api_key:
+            call_kwargs["api_key"] = LITELLM_SETTINGS.chat_openai_compatible_api_key
+        if LITELLM_SETTINGS.chat_openai_compatible_api_base:
+            call_kwargs["api_base"] = LITELLM_SETTINGS.chat_openai_compatible_api_base
+
         response = completion(
             messages=messages,
             stream=LITELLM_SETTINGS.chat_stream,
             max_retries=0,
             **complete_kwargs,
+            **call_kwargs,
             **kwargs,
         )
         if LITELLM_SETTINGS.log_llm_chat_content:
