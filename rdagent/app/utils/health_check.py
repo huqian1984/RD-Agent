@@ -99,6 +99,13 @@ def env_check():
         embedding_model = os.getenv("EMBEDDING_MODEL")
         embedding_api_key = chat_api_key
         embedding_api_base = chat_api_base
+    elif "CHAT_OPENAI_COMPATIBLE_API_KEY" in os.environ or "EMBEDDING_OPENAI_COMPATIBLE_API_KEY" in os.environ:
+        chat_api_key = os.getenv("CHAT_OPENAI_COMPATIBLE_API_KEY")
+        chat_api_base = os.getenv("CHAT_OPENAI_COMPATIBLE_API_BASE")
+        chat_model = os.getenv("CHAT_MODEL")
+        embedding_model = os.getenv("EMBEDDING_MODEL")
+        embedding_api_key = os.getenv("EMBEDDING_OPENAI_COMPATIBLE_API_KEY")
+        embedding_api_base = os.getenv("EMBEDDING_OPENAI_COMPATIBLE_API_BASE")
     else:
         logger.error("No valid configuration was found, please check your .env file.")
 

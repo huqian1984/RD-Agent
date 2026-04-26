@@ -82,8 +82,15 @@ class LiteLLMAPIBackend(APIBackend):
         call_kwargs = {
             "model": model_name,
             "input": input_content_list,
-            **LITELLM_SETTINGS.embedding_extra_params,
         }
+        if LITELLM_SETTINGS.embedding_extra_params:
+            if isinstance(LITELLM_SETTINGS.embedding_extra_params, dict):
+                call_kwargs.update(LITELLM_SETTINGS.embedding_extra_params)
+            else:
+                logger.error(
+                    f"{LogColors.RED}embedding_extra_params must be a dict, got {type(LITELLM_SETTINGS.embedding_extra_params).__name__}. Ignoring extra params.{LogColors.END}",
+                    tag="debug_litellm_emb",
+                )
         # Use embedding OpenAI-Compatible config
         if LITELLM_SETTINGS.embedding_openai_compatible_api_key:
             call_kwargs["api_key"] = LITELLM_SETTINGS.embedding_openai_compatible_api_key
@@ -160,18 +167,16 @@ class LiteLLMAPIBackend(APIBackend):
         model = complete_kwargs["model"]
 
         # Use OpenAI-Compatible API config for chat completion
-        call_kwargs: dict[str, Any] = {}
         if LITELLM_SETTINGS.chat_openai_compatible_api_key:
-            call_kwargs["api_key"] = LITELLM_SETTINGS.chat_openai_compatible_api_key
+            complete_kwargs["api_key"] = LITELLM_SETTINGS.chat_openai_compatible_api_key
         if LITELLM_SETTINGS.chat_openai_compatible_api_base:
-            call_kwargs["api_base"] = LITELLM_SETTINGS.chat_openai_compatible_api_base
+            complete_kwargs["api_base"] = LITELLM_SETTINGS.chat_openai_compatible_api_base
 
         response = completion(
             messages=messages,
             stream=LITELLM_SETTINGS.chat_stream,
             max_retries=0,
             **complete_kwargs,
-            **call_kwargs,
             **kwargs,
         )
         if LITELLM_SETTINGS.log_llm_chat_content:
